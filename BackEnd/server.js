@@ -64,10 +64,17 @@ app.post('/api/movies',async (req, res)=>{
     res.status(201).json({ message: 'Movie created successfully', movie: newMovie });
 });
 
+app.get('/api/movie/:id', async (req, res) => {
+  const movie = await movieModel.findById(req.params.id);
+  res.json(movie);
+});
+
+
 app.get('/api/movies', async (req, res) => {
   const movies = await movieModel.find({});
   res.status(200).json({movies});
 });
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
