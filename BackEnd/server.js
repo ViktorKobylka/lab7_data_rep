@@ -16,6 +16,17 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+const mongoose = require('mongoose');
+mongoose.connect('mongodb+srv://admin:admin@cluster0.s6qbn.mongodb.net/DB14');
+
+const movieSchema = new mongoose.Schema({
+  title: String,
+  year: String,
+  poster: String
+});
+
+const movieModel = new mongoose.model('Movie', movieSchema);
+
 app.get('/api/movies', (req, res) => {
     const movies = [
         {
@@ -43,9 +54,14 @@ app.get('/api/movies', (req, res) => {
     res.status(200).json({movies})
 });
 
-app.post('/api/movies',(req, res)=>{
+app.post('/api/movies',async (req, res)=>{
     console.log(req.body.title);
-    res.send("Movie Added!");
+    const { title, year, poster } = req.body;
+
+    const newMovie = new movieModel({title, year, poster});
+    await newMovie.save();
+
+    res.status(201).json({ message: 'Movie created successfully', movie: newMovie });
 })
 
 app.listen(port, () => {
