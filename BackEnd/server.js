@@ -27,7 +27,7 @@ const movieSchema = new mongoose.Schema({
 
 const movieModel = new mongoose.model('Movie', movieSchema);
 
-app.get('/api/movies', (req, res) => {
+/*app.get('/api/movies', (req, res) => {
     const movies = [
         {
           "Title": "Avengers: Infinity War (server)",
@@ -52,7 +52,7 @@ app.get('/api/movies', (req, res) => {
         }
       ];
     res.status(200).json({movies})
-});
+});*/
 
 app.post('/api/movies',async (req, res)=>{
     console.log(req.body.title);
@@ -62,7 +62,12 @@ app.post('/api/movies',async (req, res)=>{
     await newMovie.save();
 
     res.status(201).json({ message: 'Movie created successfully', movie: newMovie });
-})
+});
+
+app.get('/api/movies', async (req, res) => {
+  const movies = await movieModel.find({});
+  res.status(200).json({movies});
+});
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
