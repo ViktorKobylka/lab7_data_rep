@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express();
 const port = 4000;
-
 const cors = require('cors');
 app.use(cors());
 
+//set headers to allow cross-origin requests and specific HTTP methods
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -12,19 +12,24 @@ app.use(function(req, res, next) {
   next();
 });
 
+//add body-parser middleware
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+//import Mongoose for database interaction
 const mongoose = require('mongoose');
+//connect to MongoDB database
 mongoose.connect('mongodb+srv://admin:admin@cluster0.s6qbn.mongodb.net/DB14');
 
+//define a schema for movies
 const movieSchema = new mongoose.Schema({
   title: String,
   year: String,
   poster: String
 });
 
+//create a Mongoose model for movies
 const movieModel = new mongoose.model('Movie', movieSchema);
 
 /*app.get('/api/movies', (req, res) => {
@@ -54,28 +59,30 @@ const movieModel = new mongoose.model('Movie', movieSchema);
     res.status(200).json({movies})
 });*/
 
+//endpoint to create a new movie
 app.post('/api/movies',async (req, res)=>{
     console.log(req.body.title);
-    const { title, year, poster } = req.body;
+    const { title, year, poster } = req.body; //extract movie details from request body
 
-    const newMovie = new movieModel({title, year, poster});
-    await newMovie.save();
+    const newMovie = new movieModel({title, year, poster}); //create a new movie document
+    await newMovie.save(); //save it to the database
 
     res.status(201).json({ message: 'Movie created successfully', movie: newMovie });
 });
 
+//endpoint to get a single movie by its ID
 app.get('/api/movie/:id', async (req, res) => {
-  const movie = await movieModel.findById(req.params.id);
-  res.json(movie);
+  const movie = await movieModel.findById(req.params.id); //find movie by ID
+  res.json(movie); //return movie
 });
 
-
+//endpoint to get all movies
 app.get('/api/movies', async (req, res) => {
-  const movies = await movieModel.find({});
-  res.status(200).json({movies});
+  const movies = await movieModel.find({}); //fetch all movies
+  res.status(200).json({movies}); //return movies
 });
 
-
+//start server and log URL
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
